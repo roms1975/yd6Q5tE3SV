@@ -66,7 +66,10 @@ class Post extends \yii\db\ActiveRecord
     public function checkTimeout($attribute)
     {
         $timeout = Yii::$app->params['postTimeOut'];
-        $row = static::find()->where(['ip' => $this[$attribute]])->orderBy(['created' => SORT_DESC])->one();
+        $row = static::find()
+            ->where(['ip' => $this[$attribute]])
+            ->orderBy(['created' => SORT_DESC])
+            ->one();
 
         if ($row) {
             $time = strtotime('now') - strtotime($row['created']);

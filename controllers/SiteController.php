@@ -110,7 +110,10 @@ class SiteController extends Controller
         $link = PostLinks::find()->where(['token' => $token])->one();
         if ($link && $link->id0->active == 1) {
             if ($link->id0->load(Yii::$app->request->post())) {
-                $link->id0->save();
+                $link->id0->active = 0;
+                if (!$link->id0->save()) 
+                    error_log(print_r($link->id0->errors, true), 3, "/var/www/html/runtime/logs/post.log");
+
                 $this->redirect(['site/index']);
             }
             return $this->render('delete', ['model' => $link->id0]);
