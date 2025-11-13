@@ -6,7 +6,7 @@ https://ag-hello.notion.site/StoryValut-Yii2-2a7e9d20e57b80b895a8c26648c6f462
 
 Создать приложение "StoryValut", в котором любой может оставить своё сообщение.
 
-![Изображение](https://www.notion.so/images/page-cover/webb1.jpg)
+<img width="1025" height="576" alt="image" src="https://github.com/user-attachments/assets/afda7f7d-25ac-4e4f-ab70-8ccd7c275ab0" />
 
 ## Требование к приложению
 
