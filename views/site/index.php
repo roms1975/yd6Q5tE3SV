@@ -2,14 +2,15 @@
 
 /** @var yii\web\View $this */
 
-$this->title = Yii::$app->name;;
+$this->title = Yii::$app->name;
 ?>
+
 <div class="site-index">
     <div class="content">
         <div class="row">
             <div class="col-md-6">
                 <?php foreach ($posts as $post): ?>
-                    <?= $this->render('_card', ['post' => $post]) ?>
+                    <?= $this->render('_card', ['post' => $post, 'statistic' => $statistic]) ?>
                 <?php endforeach; ?>
             </div>
             <div class="col-md-6">

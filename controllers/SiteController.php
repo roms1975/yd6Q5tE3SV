@@ -5,9 +5,9 @@ namespace app\controllers;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
-use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\Post;
+use app\models\PostSearch;
 
 class SiteController extends Controller
 {
@@ -62,6 +62,7 @@ class SiteController extends Controller
     {
         $model = new Post();
         $posts = Post::find()->all();
+        $statistic = PostSearch::postStatisic();
 
         if ($model->load(Yii::$app->request->post())) {
             $model->ip = Yii::$app->request->userIP ?: '';
@@ -73,7 +74,11 @@ class SiteController extends Controller
             }
         }
 
-        return $this->render('index', ['model' => $model, 'posts' => $posts]);
+        return $this->render('index', [
+            'model' => $model,
+            'posts' => $posts,
+            'statistic' => $statistic
+        ]);
     }
 
 }
