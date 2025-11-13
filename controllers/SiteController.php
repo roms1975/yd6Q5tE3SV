@@ -7,9 +7,10 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\models\Post;
+use app\models\PostLinks;
 use app\models\PostSearch;
-use yii\data\Pagination;
 use yii\data\ActiveDataProvider;
+use yii\web\NotFoundHttpException;
 
 class SiteController extends Controller
 {
@@ -63,7 +64,7 @@ class SiteController extends Controller
     public function actionIndex()
     {
         $model = new Post();
-        $query = Post::find();
+        $query = Post::find()->where(['active' => 1]);
         $statistic = PostSearch::postStatisic();
 
         $dataProvider = new ActiveDataProvider([
@@ -76,6 +77,10 @@ class SiteController extends Controller
         if ($model->load(Yii::$app->request->post())) {
             $model->ip = Yii::$app->request->userIP ?: '';
             if ($model->save()) {
+                $postLinks = new PostLinks();
+                $postLinks->id = $model->id;
+                $postLinks->token = Yii::$app->security->generateRandomString();
+                $postLinks->save();
                 return $this->refresh();
             } else {
                 Yii::$app->session->setFlash('error', 'Не удалось сохранить запись');
@@ -86,4 +91,31 @@ class SiteController extends Controller
         return $this->render('index', ['model' => $model, 'dataProvider' => $dataProvider, 'statistic' => $statistic]);
     }
 
+    public function actionUpdatePost($token)
+    {
+        $link = PostLinks::find()->where(['token' => $token])->one();
+        if ($link && $link->id0->active == 1) {
+            if ($link->id0->load(Yii::$app->request->post())) {
+                $link->id0->save();
+                $this->redirect(['site/index']);
+            }
+            return $this->render('update', ['model' => $link->id0]);
+        }
+
+        throw new NotFoundHttpException('Страница не найдена');
+    }
+
+    public function actionDeletePost($token)
+    {
+        $link = PostLinks::find()->where(['token' => $token])->one();
+        if ($link && $link->id0->active == 1) {
+            if ($link->id0->load(Yii::$app->request->post())) {
+                $link->id0->save();
+                $this->redirect(['site/index']);
+            }
+            return $this->render('delete', ['model' => $link->id0]);
+        }
+
+        throw new NotFoundHttpException('Страница не найдена');
+    }
 }
