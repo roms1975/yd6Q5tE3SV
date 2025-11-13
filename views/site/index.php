@@ -1,6 +1,7 @@
 <?php
 
-/** @var yii\web\View $this */
+use \yii\widgets\LinkPager;
+use yii\widgets\ListView;
 
 $this->title = Yii::$app->name;
 ?>
@@ -9,9 +10,10 @@ $this->title = Yii::$app->name;
     <div class="content">
         <div class="row">
             <div class="col-md-6">
-                <?php foreach ($posts as $post): ?>
-                    <?= $this->render('_card', ['post' => $post, 'statistic' => $statistic]) ?>
-                <?php endforeach; ?>
+                <?= ListView::widget([
+                    'dataProvider' => $dataProvider,
+                    'itemView' => '_card',
+                ]); ?>
             </div>
             <div class="col-md-6">
                 <?= $this->render('_post_form', ['model' => $model]) ?>

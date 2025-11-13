@@ -8,6 +8,8 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\models\Post;
 use app\models\PostSearch;
+use yii\data\Pagination;
+use yii\data\ActiveDataProvider;
 
 class SiteController extends Controller
 {
@@ -61,8 +63,14 @@ class SiteController extends Controller
     public function actionIndex()
     {
         $model = new Post();
-        $posts = Post::find()->all();
-        $statistic = PostSearch::postStatisic();
+        $query = Post::find();
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => [
+                'pageSize' => Yii::$app->params['perPage'],
+            ],
+        ]);
 
         if ($model->load(Yii::$app->request->post())) {
             $model->ip = Yii::$app->request->userIP ?: '';
@@ -70,15 +78,11 @@ class SiteController extends Controller
                 return $this->refresh();
             } else {
                 Yii::$app->session->setFlash('error', 'Не удалось сохранить запись');
-                return $this->render('index', ['model' => $model, 'posts' => $posts]);
+                return $this->render('index', ['model' => $model, 'dataProvider' => $dataProvider]);
             }
         }
 
-        return $this->render('index', [
-            'model' => $model,
-            'posts' => $posts,
-            'statistic' => $statistic
-        ]);
+        return $this->render('index', ['model' => $model, 'dataProvider' => $dataProvider]);
     }
 
 }
