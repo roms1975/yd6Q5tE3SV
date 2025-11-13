@@ -16,5 +16,5 @@ use yii\widgets\ActiveForm;
 <?= $form->field($model, 'text')->textarea(['rows' => '6']) ?>
 <?= $form->field($model, 'verifyCode')->widget(\yii\captcha\Captcha::className()) ?>
 <?= Html::submitButton('Отправить', ['class' => 'btn btn-primary']) ?>
-
+<?= Html::errorSummary($model) ?>
 <?php ActiveForm::end(); ?>

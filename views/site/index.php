@@ -8,7 +8,9 @@ $this->title = Yii::$app->name;;
     <div class="content">
         <div class="row">
             <div class="col-md-6">
-                1
+                <?php foreach ($posts as $post): ?>
+                    <?= $this->render('_card', ['post' => $post]) ?>
+                <?php endforeach; ?>
             </div>
             <div class="col-md-6">
                 <?= $this->render('_post_form', ['model' => $model]) ?>

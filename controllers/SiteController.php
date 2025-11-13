@@ -61,13 +61,19 @@ class SiteController extends Controller
     public function actionIndex()
     {
         $model = new Post();
-        return $this->render('index', ['model' => $model]);
-    }
+        $posts = Post::find()->all();
 
-    /**
-     * Login action.
-     *
-     * @return Response|string
-     */
+        if ($model->load(Yii::$app->request->post())) {
+            $model->ip = Yii::$app->request->userIP ?: '';
+            if ($model->save()) {
+                return $this->refresh();
+            } else {
+                Yii::$app->session->setFlash('error', 'Не удалось сохранить запись');
+                return $this->render('index', ['model' => $model, 'posts' => $posts]);
+            }
+        }
+
+        return $this->render('index', ['model' => $model, 'posts' => $posts]);
+    }
 
 }
