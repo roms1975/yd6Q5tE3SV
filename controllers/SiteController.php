@@ -64,6 +64,7 @@ class SiteController extends Controller
     {
         $model = new Post();
         $query = Post::find();
+        $statistic = PostSearch::postStatisic();
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -78,11 +79,11 @@ class SiteController extends Controller
                 return $this->refresh();
             } else {
                 Yii::$app->session->setFlash('error', 'Не удалось сохранить запись');
-                return $this->render('index', ['model' => $model, 'dataProvider' => $dataProvider]);
+                return $this->render('index', ['model' => $model, 'dataProvider' => $dataProvider, 'statistic' => $statistic]);
             }
         }
 
-        return $this->render('index', ['model' => $model, 'dataProvider' => $dataProvider]);
+        return $this->render('index', ['model' => $model, 'dataProvider' => $dataProvider, 'statistic' => $statistic]);
     }
 
 }

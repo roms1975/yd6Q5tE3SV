@@ -12,7 +12,12 @@ $this->title = Yii::$app->name;
             <div class="col-md-6">
                 <?= ListView::widget([
                     'dataProvider' => $dataProvider,
-                    'itemView' => '_card',
+                    'itemView' => function ($model, $key, $index, $widget) use ($statistic) {
+                        return $this->render('_card', [
+                            'model' => $model,
+                            'statistic' => $statistic,
+                        ]);
+                    },
                 ]); ?>
             </div>
             <div class="col-md-6">
