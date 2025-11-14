@@ -112,11 +112,13 @@ class SiteController extends Controller
         if (($link !== null) && $model->active == 1) {
             if ($model->load(Yii::$app->request->post())) {
                 $model->setScenario(POST::SCENARIO_UPDATE);
-                if (!$model->save())
-                    error_log(print_r($link->errors, true), 3, "/var/www/html/runtime/logs/err.log");
+                if ($model->save()) {
+                    $this->redirect(['site/index']);
+                }
 
-                $this->redirect(['site/index']);
+                Yii::$app->session->setFlash('error', 'Не удалось обновить запись');
             }
+
             return $this->render('update', ['model' => $model]);
         }
 
@@ -137,12 +139,19 @@ class SiteController extends Controller
     {
         $link = PostLinks::find()->where(['token' => $token])->one();
         if (($link !== null) && $link->id0->active == 1) {
-            if ($link->id0->load(Yii::$app->request->post())) {
-                $link->id0->active = 0;
-                $link->id0->save();
-                $this->redirect(['site/index']);
+            $model = $link->id0;
+            $model->setScenario(POST::SCENARIO_DELETE);
+
+            if ($model->load(Yii::$app->request->post())) {
+                $model->active = 0;
+                if ($model->save()) {
+                    $this->redirect(['site/index']);
+                }
+
+                Yii::$app->session->setFlash('error', 'Не удалось удалить запись');
             }
-            return $this->render('delete', ['model' => $link->id0, 'token' => $link->token]);
+
+            return $this->render('delete', ['model' => $model, 'token' => $link->token]);
         }
 
         throw new NotFoundHttpException('Запись не найдена');

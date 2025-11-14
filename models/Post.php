@@ -69,6 +69,7 @@ class Post extends ActiveRecord
             ['verifyCode', 'captcha'],
             ['ip', 'checkTimeout', 'on' => self::SCENARIO_CREATE],
             ['ip', 'checkTimeoutUpdate', 'on' => self::SCENARIO_UPDATE],
+            ['ip', 'checkTimeoutDelete', 'on' => self::SCENARIO_DELETE],
         ];
     }
 
@@ -112,7 +113,7 @@ class Post extends ActiveRecord
 
     public function checkTimeoutUpdate($attribute)
     {
-        $timeout = Yii::$app->params['postTimeOut'];
+        $timeout = Yii::$app->params['postUpdateTimeOut'];
         $row = static::find()
             ->where([$attribute => $this[$attribute]])
             ->orderBy(['created' => SORT_DESC])
@@ -121,11 +122,30 @@ class Post extends ActiveRecord
         if ($row) {
             $time = time() - $row['created'];
 
-//            if ($time < $timeout) {
-//                $left = $timeout - $time;
-//                $this->addError($attribute, "Следующее сообщение можно опубликовать через {$left} секунд.");
-//                return false;
-//            }
+           if ($time > $timeout) {
+               $this->addError($attribute, "Истек период для редактирования сообщения.");
+               return false;
+           }
+        }
+
+        return true;
+    }
+
+    public function checkTimeoutDelete($attribute)
+    {
+        $timeout = Yii::$app->params['postDeleteTimeOut'];
+        $row = static::find()
+            ->where([$attribute => $this[$attribute]])
+            ->orderBy(['created' => SORT_DESC])
+            ->one();
+
+        if ($row) {
+            $time = time() - $row['created'];
+
+           if ($time > $timeout) {
+               $this->addError($attribute, "Истек период для удаления сообщения.");
+               return false;
+           }
         }
 
         return true;

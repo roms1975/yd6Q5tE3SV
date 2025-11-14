@@ -10,7 +10,7 @@ class m251114_111546_alter_table_post_change_column_create_to_unixtime extends M
     public function safeUp()
     {
         $this->alterColumn('{{post}}', 'created', $this->bigInteger()->unsigned()->notNull());
-        $this->alterColumn('{{post}}', 'updated', $this->bigInteger()->unsigned()->notNull());
+        $this->alterColumn('{{post}}', 'updated', $this->bigInteger()->unsigned());
     }
 
     /**

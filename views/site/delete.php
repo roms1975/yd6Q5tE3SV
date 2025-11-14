@@ -24,6 +24,8 @@ $this->title = Yii::$app->name;
                     <?= Html::submitButton('Удалить', ['class' => 'btn btn-primary']) ?>
                     <?= Html::a('Отмена', ['site/index'],['class' => 'btn btn-default']) ?>
                 </div>
+                <?= Html::errorSummary($model) ?>
+
                 <?php ActiveForm::end(); ?>
 
             </div>
