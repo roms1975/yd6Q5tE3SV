@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\HtmlPurifier;
 
 /**
  * This is the model class for table "post".
@@ -36,6 +37,11 @@ class Post extends \yii\db\ActiveRecord
             [['name', 'email', 'text'], 'required'],
             [['name'], 'string', 'min' => 2, 'max' => 15],
             ['text', 'filter', 'filter' => 'trim'],
+            ['text', 'filter', 'filter' => function($value) {
+                return HtmlPurifier::process($value, [
+                    'HTML.AllowedElements' => ['b', 'i', 's'],
+                ]);
+            }],
             [['text'], 'string', 'min' => 5, 'max' => 1000],
             [['email'], 'email'],
             //[['name', 'email', 'text', 'ip', 'updated'], 'default', 'value' => null],

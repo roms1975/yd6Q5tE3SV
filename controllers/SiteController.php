@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use Yii;
+use yii\base\BaseObject;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -64,7 +65,7 @@ class SiteController extends Controller
     public function actionIndex()
     {
         $model = new Post();
-        $query = Post::find()->where(['active' => 1]);
+        $query = Post::find()->where(['active' => 1])->orderBy('created DESC');
         $statistic = PostSearch::postStatisic();
 
         $dataProvider = new ActiveDataProvider([
@@ -94,7 +95,7 @@ class SiteController extends Controller
     public function actionUpdatePost($token)
     {
         $link = PostLinks::find()->where(['token' => $token])->one();
-        if ($link && $link->id0->active == 1) {
+        if (($link !== null) && $link->id0->active == 1) {
             if ($link->id0->load(Yii::$app->request->post())) {
                 $link->id0->save();
                 $this->redirect(['site/index']);
@@ -105,20 +106,28 @@ class SiteController extends Controller
         throw new NotFoundHttpException('Страница не найдена');
     }
 
+    public function actionDeleteConfirm($token)
+    {
+        $link = PostLinks::find()->where(['token' => $token])->one();
+        if (($link === null) || $link->id0->active == 0) {
+            throw new NotFoundHttpException('Запись не найдена.');
+        }
+
+        return $this->render('delete', ['model' => $link->id0, 'token' => $link->token]);
+    }
+
     public function actionDeletePost($token)
     {
         $link = PostLinks::find()->where(['token' => $token])->one();
-        if ($link && $link->id0->active == 1) {
+        if (($link !== null) && $link->id0->active == 1) {
             if ($link->id0->load(Yii::$app->request->post())) {
                 $link->id0->active = 0;
-                if (!$link->id0->save()) 
-                    error_log(print_r($link->id0->errors, true), 3, "/var/www/html/runtime/logs/post.log");
-
+                $link->id0->save();
                 $this->redirect(['site/index']);
             }
-            return $this->render('delete', ['model' => $link->id0]);
+            return $this->render('delete', ['model' => $link->id0, 'token' => $link->token]);
         }
 
-        throw new NotFoundHttpException('Страница не найдена');
+        throw new NotFoundHttpException('Запись не найдена');
     }
 }

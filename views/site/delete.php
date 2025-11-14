@@ -14,14 +14,17 @@ $this->title = Yii::$app->name;
                 <?php
                 $form = ActiveForm::begin([
                     'id' => 'delete-form',
+                    'action' => ['/site/delete-post', 'token' => $token],
                 ]);
                 ?>
                 <?= Html::hiddenInput('confirm-delete', 1) ?>
                 <?= $this->render('_card', ['model' => $model]) ?>
                 <?= $form->field($model, 'verifyCode')->widget(\yii\captcha\Captcha::className()) ?>
-                <?= Html::submitButton('Удалить', ['class' => 'btn btn-primary']) ?>
+                <div class="form-group">
+                    <?= Html::submitButton('Удалить', ['class' => 'btn btn-primary']) ?>
+                    <?= Html::a('Отмена', ['site/index'],['class' => 'btn btn-default']) ?>
+                </div>
                 <?php ActiveForm::end(); ?>
-                <?= Html::a('Отмена', ['site/index'],['class' => 'btn btn-info']) ?>
 
             </div>
         </div>
