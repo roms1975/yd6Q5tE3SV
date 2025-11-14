@@ -125,16 +125,6 @@ class SiteController extends Controller
         throw new NotFoundHttpException('Страница не найдена');
     }
 
-    public function actionDeleteConfirm($token)
-    {
-        $link = PostLinks::find()->where(['token' => $token])->one();
-        if (($link === null) || $link->id0->active == 0) {
-            throw new NotFoundHttpException('Запись не найдена.');
-        }
-
-        return $this->render('delete', ['model' => $link->id0, 'token' => $link->token]);
-    }
-
     public function actionDeletePost($token)
     {
         $link = PostLinks::find()->where(['token' => $token])->one();
