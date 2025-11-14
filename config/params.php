@@ -5,5 +5,7 @@ return [
     'senderEmail' => 'noreply@example.com',
     'senderName' => 'Example.com mailer',
     'postTimeOut' => 180,
-    'perPage' => 3,
+    'postUpdateTimeOut' => 180,
+    'postDeleteTimeOut' => 180,
+    'perPage' => 10,
 ];

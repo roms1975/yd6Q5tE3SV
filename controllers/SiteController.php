@@ -65,6 +65,8 @@ class SiteController extends Controller
     public function actionIndex()
     {
         $model = new Post();
+        $model->setScenario(POST::SCENARIO_CREATE);
+
         $query = Post::find()->where(['active' => 1])->orderBy('created DESC');
         $statistic = PostSearch::postStatisic();
 
@@ -80,8 +82,19 @@ class SiteController extends Controller
             if ($model->save()) {
                 $postLinks = new PostLinks();
                 $postLinks->id = $model->id;
-                $postLinks->token = Yii::$app->security->generateRandomString();
+                $token = Yii::$app->security->generateRandomString();
+                $postLinks->token = preg_replace('/[^a-zA-Z0-9]/', '', $token);
+
                 $postLinks->save();
+
+                /* сохраняем ссылки для обновления и удаления поста */
+                $url = Yii::$app->request->hostInfo;
+                error_log("Ссылка для редактирования поста ID={$postLinks->id}: " .
+                    "{$url}/site/update-post/{$postLinks->token}\n", 3, "/var/www/html/runtime/logs/links.log");
+
+                error_log("Ссылка для удаления поста ID={$postLinks->id}: " .
+                    "{$url}/site/delete-post/{$postLinks->token}\n", 3, "/var/www/html/runtime/logs/links.log");
+
                 return $this->refresh();
             } else {
                 Yii::$app->session->setFlash('error', 'Не удалось сохранить запись');
@@ -95,12 +108,16 @@ class SiteController extends Controller
     public function actionUpdatePost($token)
     {
         $link = PostLinks::find()->where(['token' => $token])->one();
-        if (($link !== null) && $link->id0->active == 1) {
-            if ($link->id0->load(Yii::$app->request->post())) {
-                $link->id0->save();
+        $model = $link->id0;
+        if (($link !== null) && $model->active == 1) {
+            if ($model->load(Yii::$app->request->post())) {
+                $model->setScenario(POST::SCENARIO_UPDATE);
+                if (!$model->save())
+                    error_log(print_r($link->errors, true), 3, "/var/www/html/runtime/logs/err.log");
+
                 $this->redirect(['site/index']);
             }
-            return $this->render('update', ['model' => $link->id0]);
+            return $this->render('update', ['model' => $model]);
         }
 
         throw new NotFoundHttpException('Страница не найдена');

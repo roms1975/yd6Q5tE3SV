@@ -3,7 +3,9 @@
 namespace app\models;
 
 use Yii;
+use yii\db\ActiveRecord;
 use yii\helpers\HtmlPurifier;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "post".
@@ -16,9 +18,27 @@ use yii\helpers\HtmlPurifier;
  * @property string|null $created
  * @property string|null $updated
  */
-class Post extends \yii\db\ActiveRecord
+class Post extends ActiveRecord
 {
     public $verifyCode;
+
+    const SCENARIO_CREATE = 'create';
+    const SCENARIO_UPDATE = 'update';
+    const SCENARIO_DELETE = 'delete';
+
+    public function behaviors()
+    {
+        return [
+            'timestamp' => [
+                'class' => TimestampBehavior::class,
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['created'],
+                    ActiveRecord::EVENT_BEFORE_UPDATE => ['updated'],
+                ],
+                'value' => time(),
+            ],
+        ];
+    }
 
     /**
      * {@inheritdoc}
@@ -44,11 +64,11 @@ class Post extends \yii\db\ActiveRecord
             }],
             [['text'], 'string', 'min' => 5, 'max' => 1000],
             [['email'], 'email'],
-            //[['name', 'email', 'text', 'ip', 'updated'], 'default', 'value' => null],
             [['created', 'updated'], 'safe'],
             [['name', 'email', 'ip'], 'string', 'max' => 255],
             ['verifyCode', 'captcha'],
-            ['ip', 'checkTimeout']
+            ['ip', 'checkTimeout', 'on' => self::SCENARIO_CREATE],
+            ['ip', 'checkTimeoutUpdate', 'on' => self::SCENARIO_UPDATE],
         ];
     }
 
@@ -63,8 +83,8 @@ class Post extends \yii\db\ActiveRecord
             'email' => 'Email',
             'text' => 'Сообщение',
             'ip' => 'Ip',
-            'created' => 'Created',
-            'updated' => 'Updated',
+            'created' => 'Создано',
+            'updated' => 'Обновлено',
             'verifyCode' => 'Код с картинки'
         ];
     }
@@ -73,18 +93,39 @@ class Post extends \yii\db\ActiveRecord
     {
         $timeout = Yii::$app->params['postTimeOut'];
         $row = static::find()
-            ->where(['ip' => $this[$attribute]])
+            ->where([$attribute => $this[$attribute]])
             ->orderBy(['created' => SORT_DESC])
             ->one();
 
         if ($row) {
-            $time = strtotime('now') - strtotime($row['created']);
+            $time = time() - $row['created'];
 
             if ($time < $timeout) {
                 $left = $timeout - $time;
                 $this->addError($attribute, "Следующее сообщение можно опубликовать через {$left} секунд.");
                 return false;
             }
+        }
+
+        return true;
+    }
+
+    public function checkTimeoutUpdate($attribute)
+    {
+        $timeout = Yii::$app->params['postTimeOut'];
+        $row = static::find()
+            ->where([$attribute => $this[$attribute]])
+            ->orderBy(['created' => SORT_DESC])
+            ->one();
+
+        if ($row) {
+            $time = time() - $row['created'];
+
+//            if ($time < $timeout) {
+//                $left = $timeout - $time;
+//                $this->addError($attribute, "Следующее сообщение можно опубликовать через {$left} секунд.");
+//                return false;
+//            }
         }
 
         return true;
