@@ -12,5 +12,5 @@ https://ag-hello.notion.site/StoryValut-Yii2-2a7e9d20e57b80b895a8c26648c6f462
 **Для удаления** создается ссылка типа https:/<site>/site/delete-confirm/GcTNpsTuLuFxyc9bhkqfkv_9mK91nRoq  
 токен тот же, из той же таблицы
 
-**Эти ссылки** сохраняются в файл /runtime/logs/runtime/logs  
+**Эти ссылки** сохраняются в файл /runtime/logs/links.log  
 
